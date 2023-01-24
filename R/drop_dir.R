@@ -101,7 +101,7 @@ drop_dir <- function(
     while (content$has_more) {
 
       # update content, append results
-      content <- drop_list_folder_continue(content$cursor)
+      content <- drop_list_folder_continue(content$cursor, dtoken)
       results  <- append(results, content$entries)
     }
   }
