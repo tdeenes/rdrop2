@@ -122,7 +122,7 @@ drop_get <- function(
       message(sprintf("\n %s on disk %s KB", filename, file.size(filename)/1000))
       TRUE
     } else {
-      drop_get_metadata(path)
+      drop_get_metadata(path, dtoken = dtoken)
     }
   } else {
     message("File not found on Dropbox \n")

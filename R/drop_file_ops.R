@@ -35,15 +35,15 @@ drop_copy <-
 
     # Copying a file into a folder
     file_to_folder <-
-      c(drop_type(from_path) == "file",
-        drop_type(to_path) == "folder")
+      c(drop_type(from_path, dtoken = dtoken) == "file",
+        drop_type(to_path, dtoken = dtoken) == "folder")
     to_path <-
       ifelse(all(file_to_folder), paste0(to_path, from_path), to_path)
 
     # coping a folder to another folder
     folder_to_folder <-
-      c(drop_type(from_path) == "folder",
-        drop_type(to_path) == "folder")
+      c(drop_type(from_path, dtoken = dtoken) == "folder",
+        drop_type(to_path, dtoken = dtoken) == "folder")
     to_path <-
       ifelse(all(folder_to_folder), paste0(to_path, from_path), to_path)
 
@@ -62,7 +62,7 @@ drop_copy <-
       )
     )
 
-    if (drop_exists(from_path)) {
+    if (drop_exists(from_path, dtoken = dtoken)) {
       # copy
       x <-
         httr::POST(copy_url,
@@ -125,8 +125,8 @@ drop_move <-
 
     # Moving a folder to another folder
     folder_to_folder <-
-      c(drop_type(from_path) == "folder",
-        drop_type(to_path) == "folder")
+      c(drop_type(from_path, dtoken = dtoken) == "folder",
+        drop_type(to_path, dtoken = dtoken) == "folder")
     to_path <-
       ifelse(all(folder_to_folder), paste0(to_path, from_path), to_path)
 
@@ -145,7 +145,7 @@ drop_move <-
       )
     )
 
-    if (drop_exists(from_path)) {
+    if (drop_exists(from_path, dtoken = dtoken)) {
       # move
       x <-
         httr::POST(move_url,
@@ -179,7 +179,7 @@ drop_delete <-
             verbose = FALSE,
             dtoken = get_dropbox_token()) {
     create_url <- "https://api.dropboxapi.com/2/files/delete_v2"
-    if (drop_exists(path)) {
+    if (drop_exists(path, dtoken = dtoken)) {
       path <- add_slashes(path)
       x <-
         httr::POST(
@@ -223,7 +223,7 @@ drop_create <-
 
    # if a folder exists, but autorename is TRUE, proceed
    # However, if a folder exists, and autorename if FALSE, fail in the else.
-    if (!drop_exists(path) || autorename) {
+    if (!drop_exists(path, dtoken = dtoken) || autorename) {
       create_url <- "https://api.dropboxapi.com/2/files/create_folder_v2"
 
       path <- add_slashes(path)
@@ -312,7 +312,7 @@ drop_exists <- function(path = NULL, dtoken = get_dropbox_token()) {
 #'
 #' @noRd
 drop_is_file <- function(x, dtoken = get_dropbox_token()) {
-  x <- drop_get_metadata(x)
+  x <- drop_get_metadata(x, dtoken = dtoken)
   ifelse(x$.tag == "file", TRUE, FALSE)
 }
 
@@ -320,7 +320,7 @@ drop_is_file <- function(x, dtoken = get_dropbox_token()) {
 #'
 #' @noRd
 drop_is_folder <- function(x, dtoken = get_dropbox_token()) {
-  x <- drop_get_metadata(x)
+  x <- drop_get_metadata(x, dtoken = dtoken)
   ifelse(x$.tag == "folder", TRUE, FALSE)
 }
 
@@ -329,7 +329,7 @@ drop_is_folder <- function(x, dtoken = get_dropbox_token()) {
 drop_type <- function(x, dtoken = get_dropbox_token()) {
   safe_meta <-
     purrr::safely(drop_get_metadata, otherwise = FALSE, quiet = TRUE)
-  x <- safe_meta(x)
+  x <- safe_meta(x, dtoken = dtoken)
   if (length(x$result) == 1 && !x$result) {
     FALSE
   } else {

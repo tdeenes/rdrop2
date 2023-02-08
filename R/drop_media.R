@@ -17,7 +17,7 @@
 #'}
 drop_media <- function(path = NULL, dtoken = get_dropbox_token()) {
   assertive::assert_is_not_null(path)
-  if(drop_exists(path)) {
+  if(drop_exists(path, dtoken = dtoken)) {
     media_url <- "https://api.dropbox.com/2/files/get_temporary_link"
     path <- add_slashes(path)
     res <- POST(media_url, body = list(path = path), httr::config(token = dtoken), encode = "json")
