@@ -11,7 +11,8 @@ drop_upload(
   autorename = TRUE,
   mute = FALSE,
   verbose = FALSE,
-  dtoken = get_dropbox_token()
+  dtoken = get_dropbox_token(),
+  remote_file_name = basename(file)
 )
 }
 \arguments{
@@ -20,7 +21,7 @@ drop_upload(
 \item{path}{The relative path on Dropbox where the file should get uploaded.}
 
 \item{mode}{- "add" - will not overwrite an existing file in case of a
-conflict. With this mode, when a a duplicate file.txt is uploaded, it  will
+conflict. With this mode, when a duplicate file.txt is uploaded, it  will
 become file (2).txt. - "overwrite" will always overwrite a file -}
 
 \item{autorename}{This logical determines what happens when there is a
@@ -40,9 +41,12 @@ will try to automatically locate your local credential cache and use them.
 However, if the credentials are not found, the function will initiate a new
 authentication request. You can override this in \code{\link{drop_auth}} by
 pointing to a different location where your credentials are stored.}
+
+\item{remote_file_name}{The name of the file when uploaded to Dropbox.
+Defaults to the name of the local file.}
 }
 \description{
-This function will allow you to write files of any size to Dropbox(even ones
+This function will allow you to write files of any size to Dropbox (even ones
 that cannot be read into memory) by uploading them in chunks.
 }
 \examples{

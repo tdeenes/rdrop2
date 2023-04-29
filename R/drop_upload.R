@@ -5,13 +5,13 @@
 
 #'Uploads a file to Dropbox.
 #'
-#'This function will allow you to write files of any size to Dropbox(even ones
+#'This function will allow you to write files of any size to Dropbox (even ones
 #'that cannot be read into memory) by uploading them in chunks.
 #'
 #'@param file Relative path to local file.
 #'@param path The relative path on Dropbox where the file should get uploaded.
 #'@param mode - "add" - will not overwrite an existing file in case of a
-#'  conflict. With this mode, when a a duplicate file.txt is uploaded, it  will
+#'  conflict. With this mode, when a duplicate file.txt is uploaded, it  will
 #'  become file (2).txt. - "overwrite" will always overwrite a file -
 #'@param autorename This logical determines what happens when there is a
 #'  conflict. If true, the file being uploaded will be automatically renamed to
@@ -20,6 +20,8 @@
 #'  false, the call will fail with a 409 (Conflict) response code. The default is `TRUE`
 #'@param mute Set to FALSE to prevent a notification trigger on the desktop and
 #'  mobile apps
+#'@param remote_file_name The name of the file when uploaded to Dropbox.
+#'  Defaults to the name of the local file.
 #' @references \href{https://www.dropbox.com/developers/documentation/http/documentation#files-upload}{API documentation}
 #'@template verbose
 #'@template token
@@ -34,7 +36,8 @@ drop_upload <- function(file,
                         autorename = TRUE,
                         mute = FALSE,
                         verbose = FALSE,
-                        dtoken = get_dropbox_token()) {
+                        dtoken = get_dropbox_token(),
+                        remote_file_name = basename(file)) {
   put_url <- "https://content.dropboxapi.com/2/files/upload"
 
   # Check that object exists locally before adding slashes
@@ -45,10 +48,11 @@ drop_upload <- function(file,
   assertive::assert_any_are_matching_fixed(standard_modes, mode)
 
   # Dropbox API requires a / before an object name.
+  assertive::assert_is_a_string(remote_file_name)
   if (is.null(path)) {
-    path <- add_slashes(basename(file))
+    path <- add_slashes(remote_file_name)
   } else {
-    path <- paste0("/", strip_slashes(path), "/", basename(file))
+    path <- paste0("/", strip_slashes(path), "/", remote_file_name)
   }
 
   req <- httr::POST(
